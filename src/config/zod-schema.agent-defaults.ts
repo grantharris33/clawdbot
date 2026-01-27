@@ -13,6 +13,67 @@ import {
   HumanDelaySchema,
 } from "./zod-schema.core.js";
 
+export const DockerClaudeCodePoolSchema = z
+  .object({
+    minWarm: z.number().int().nonnegative().optional(),
+    maxTotal: z.number().int().positive().optional(),
+    maxPerAgent: z.number().int().positive().optional(),
+  })
+  .strict()
+  .optional();
+
+export const DockerClaudeCodeResourceSchema = z
+  .object({
+    memory: z.string().optional(),
+    cpus: z.number().positive().optional(),
+    pidsLimit: z.number().int().positive().optional(),
+  })
+  .strict()
+  .optional();
+
+export const DockerClaudeCodeTimeoutSchema = z
+  .object({
+    idleMs: z.number().int().positive().optional(),
+    maxAgeMs: z.number().int().positive().optional(),
+    healthIntervalMs: z.number().int().positive().optional(),
+    startupMs: z.number().int().positive().optional(),
+  })
+  .strict()
+  .optional();
+
+export const DockerClaudeCodeRedisSchema = z
+  .object({
+    url: z.string().optional(),
+    keyPrefix: z.string().optional(),
+  })
+  .strict()
+  .optional();
+
+export const DockerClaudeCodeDockerSchema = z
+  .object({
+    containerPrefix: z.string().optional(),
+    network: z.string().optional(),
+    capDrop: z.array(z.string()).optional(),
+    securityOpts: z.array(z.string()).optional(),
+    binds: z.array(z.string()).optional(),
+    env: z.record(z.string(), z.string()).optional(),
+  })
+  .strict()
+  .optional();
+
+export const DockerClaudeCodeSchema = z
+  .object({
+    enabled: z.boolean().optional(),
+    pool: DockerClaudeCodePoolSchema,
+    image: z.string().optional(),
+    resources: DockerClaudeCodeResourceSchema,
+    timeouts: DockerClaudeCodeTimeoutSchema,
+    redis: DockerClaudeCodeRedisSchema,
+    docker: DockerClaudeCodeDockerSchema,
+  })
+  .strict()
+  .optional();
+
 export const AgentDefaultsSchema = z
   .object({
     model: z
@@ -167,6 +228,7 @@ export const AgentDefaultsSchema = z
       })
       .strict()
       .optional(),
+    dockerClaudeCode: DockerClaudeCodeSchema,
   })
   .strict()
   .optional();
