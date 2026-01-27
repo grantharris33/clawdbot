@@ -360,17 +360,39 @@ export async function checkContainerConfig(
 }
 
 /**
- * Wait for container to be ready (checking via Redis health status).
+ * Wait for container to be ready by polling a health check function.
+ *
+ * @param name - Container name (for logging)
+ * @param timeoutMs - Maximum time to wait
+ * @param checkFn - Function that returns true when container is ready
+ * @param pollIntervalMs - How often to poll (default 250ms)
+ * @returns true if container became ready, false if timeout reached
  */
 export async function waitForContainerReady(
-  _name: string,
-  _timeoutMs: number,
-  _checkFn: () => Promise<boolean>,
+  name: string,
+  timeoutMs: number,
+  checkFn: () => Promise<boolean>,
+  pollIntervalMs = 250,
 ): Promise<boolean> {
-  // This will be implemented to poll Redis for health status
-  // For now, just return true after a brief delay
-  await new Promise((resolve) => setTimeout(resolve, 1000));
-  return true;
+  const startTime = Date.now();
+
+  while (Date.now() - startTime < timeoutMs) {
+    try {
+      const ready = await checkFn();
+      if (ready) {
+        return true;
+      }
+    } catch (err) {
+      // Check function failed, container not ready yet
+      console.debug(`Container ${name} health check failed: ${String(err)}`);
+    }
+
+    // Wait before next poll
+    await new Promise((resolve) => setTimeout(resolve, pollIntervalMs));
+  }
+
+  console.warn(`Container ${name} did not become ready within ${timeoutMs}ms`);
+  return false;
 }
 
 /**

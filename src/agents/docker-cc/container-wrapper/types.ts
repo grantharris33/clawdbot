@@ -69,7 +69,7 @@ export interface ImageInput {
  * Interrupt message types.
  */
 export interface InterruptMessage {
-  type: "stop" | "redirect" | "pause";
+  type: "stop" | "redirect" | "pause" | "resume";
   message?: string;
   priority?: "normal" | "high";
 }
@@ -91,7 +91,14 @@ export interface ClaudeResult {
 /**
  * Wrapper state values.
  */
-export type WrapperState = "starting" | "idle" | "running" | "stopping" | "stopped" | "failed";
+export type WrapperState =
+  | "starting"
+  | "idle"
+  | "running"
+  | "paused"
+  | "stopping"
+  | "stopped"
+  | "failed";
 
 /**
  * Output payload for Redis publishing.

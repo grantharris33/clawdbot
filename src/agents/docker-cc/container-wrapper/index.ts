@@ -147,7 +147,15 @@ class WrapperApp {
         break;
 
       case "pause":
-        console.warn("Pause interrupt not yet implemented");
+        if (this.runner) {
+          await this.runner.pause();
+        }
+        break;
+
+      case "resume":
+        if (this.runner) {
+          await this.runner.resume();
+        }
         break;
 
       default:

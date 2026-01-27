@@ -74,6 +74,7 @@ export type ContainerStatus =
   | "starting"
   | "idle"
   | "running"
+  | "paused"
   | "stopping"
   | "stopped"
   | "failed";
@@ -308,7 +309,7 @@ export interface ImageInput {
  * Interrupt message for session control.
  */
 export interface InterruptMessage {
-  type: "stop" | "redirect" | "pause";
+  type: "stop" | "redirect" | "pause" | "resume";
   message?: string;
   priority?: "normal" | "high";
 }

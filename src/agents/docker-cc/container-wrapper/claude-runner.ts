@@ -221,6 +221,7 @@ export class InteractiveRunner {
   private runner: ClaudeRunner;
   private turnCount = 0;
   private shutdown = false;
+  private paused = false;
 
   constructor(config: WrapperConfig, publisher: RedisPublisher) {
     this.config = config;
@@ -237,6 +238,12 @@ export class InteractiveRunner {
     await this.publisher.updateState("idle");
 
     while (!this.shutdown) {
+      // Check if paused - skip input processing while paused
+      if (this.paused) {
+        await new Promise((resolve) => setTimeout(resolve, 250));
+        continue;
+      }
+
       try {
         // Wait for input (with 1 second timeout to check shutdown flag)
         const inputData = await this.publisher.getInput(1);
@@ -283,6 +290,36 @@ export class InteractiveRunner {
   async stop(): Promise<void> {
     this.shutdown = true;
     await this.runner.stop();
+  }
+
+  /**
+   * Pause the session - stop processing new inputs.
+   * Current running prompt will complete, but no new prompts will be processed.
+   */
+  async pause(): Promise<void> {
+    if (this.paused) return;
+
+    console.log(`Pausing session ${this.config.sessionId}`);
+    this.paused = true;
+    await this.publisher.updateState("paused");
+  }
+
+  /**
+   * Resume a paused session.
+   */
+  async resume(): Promise<void> {
+    if (!this.paused) return;
+
+    console.log(`Resuming session ${this.config.sessionId}`);
+    this.paused = false;
+    await this.publisher.updateState("idle");
+  }
+
+  /**
+   * Check if session is paused.
+   */
+  get isPaused(): boolean {
+    return this.paused;
   }
 
   /**
