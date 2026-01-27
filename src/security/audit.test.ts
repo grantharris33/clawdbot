@@ -732,7 +732,7 @@ describe("security audit", () => {
 
   it("does not warn on Venice-style opus-45 model names", async () => {
     // Venice uses "claude-opus-45" format (no dash between 4 and 5)
-    const cfg: ClawdbotConfig = {
+    const cfg: MoltbotConfig = {
       agents: { defaults: { model: { primary: "venice/claude-opus-45" } } },
     };
 

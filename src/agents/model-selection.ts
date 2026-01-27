@@ -51,7 +51,7 @@ export function isDockerClaudeCodeProvider(provider: string): boolean {
 /**
  * Check if Docker Claude Code is enabled in configuration.
  */
-export function isDockerClaudeCodeEnabled(cfg?: ClawdbotConfig): boolean {
+export function isDockerClaudeCodeEnabled(cfg?: MoltbotConfig): boolean {
   return cfg?.agents?.defaults?.dockerClaudeCode?.enabled === true;
 }
 

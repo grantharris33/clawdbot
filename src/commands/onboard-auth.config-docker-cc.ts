@@ -4,7 +4,7 @@
  * Provides both config manipulation and Docker infrastructure setup.
  */
 
-import type { ClawdbotConfig } from "../config/config.js";
+import type { MoltbotConfig } from "../config/config.js";
 
 /**
  * Default model reference for Docker Claude Code.
@@ -261,7 +261,7 @@ export async function pullDockerCCImage(
  * Apply Docker CC provider configuration without changing the default model.
  */
 export function applyDockerCCProviderConfig(
-  cfg: ClawdbotConfig,
+  cfg: MoltbotConfig,
   params?: {
     redisUrl?: string;
     pool?: {
@@ -271,7 +271,7 @@ export function applyDockerCCProviderConfig(
     };
     image?: string;
   },
-): ClawdbotConfig {
+): MoltbotConfig {
   const models = { ...cfg.agents?.defaults?.models };
   models[DOCKER_CC_DEFAULT_MODEL_REF] = {
     ...models[DOCKER_CC_DEFAULT_MODEL_REF],
@@ -316,7 +316,7 @@ export function applyDockerCCProviderConfig(
  * Apply Docker CC provider configuration AND set it as the default model.
  */
 export function applyDockerCCConfig(
-  cfg: ClawdbotConfig,
+  cfg: MoltbotConfig,
   params?: {
     enabled?: boolean;
     redisUrl?: string;
@@ -327,7 +327,7 @@ export function applyDockerCCConfig(
     };
     image?: string;
   },
-): ClawdbotConfig {
+): MoltbotConfig {
   const next = applyDockerCCProviderConfig(cfg, params);
   const existingModel = next.agents?.defaults?.model;
 
@@ -370,7 +370,7 @@ export function applyDockerCCConfig(
 /**
  * Disable Docker CC provider.
  */
-export function disableDockerCCConfig(cfg: ClawdbotConfig): ClawdbotConfig {
+export function disableDockerCCConfig(cfg: MoltbotConfig): MoltbotConfig {
   const existingDockerCC = cfg.agents?.defaults?.dockerClaudeCode;
   if (!existingDockerCC) return cfg;
 

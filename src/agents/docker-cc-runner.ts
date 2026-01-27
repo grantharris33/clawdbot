@@ -7,7 +7,7 @@
  */
 
 import type { ImageContent } from "@mariozechner/pi-ai";
-import type { ClawdbotConfig } from "../config/config.js";
+import type { MoltbotConfig } from "../config/config.js";
 import type { AgentStreamParams } from "../commands/agent/types.js";
 import type { EmbeddedPiRunResult } from "./pi-embedded-runner/types.js";
 import {
@@ -26,7 +26,7 @@ export interface DockerCCAgentParams {
   sessionKey?: string;
   sessionFile: string;
   workspaceDir: string;
-  config?: ClawdbotConfig;
+  config?: MoltbotConfig;
   prompt: string;
   provider: string;
   model?: string;
@@ -41,7 +41,7 @@ export interface DockerCCAgentParams {
 /**
  * Check if Docker CC is available for use.
  */
-export async function checkDockerCCAvailable(cfg?: ClawdbotConfig): Promise<boolean> {
+export async function checkDockerCCAvailable(cfg?: MoltbotConfig): Promise<boolean> {
   const dockerCCConfig = cfg?.agents?.defaults?.dockerClaudeCode;
   if (!dockerCCConfig?.enabled) {
     return false;
