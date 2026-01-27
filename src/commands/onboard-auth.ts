@@ -36,8 +36,15 @@ export {
   applyDockerCCConfig,
   applyDockerCCProviderConfig,
   checkDockerAvailability,
+  checkRedisAvailability,
+  createDockerNetwork,
   disableDockerCCConfig,
+  DOCKER_CC_DEFAULT_IMAGE,
   DOCKER_CC_DEFAULT_MODEL_REF,
+  DOCKER_CC_DEFAULT_NETWORK,
+  DOCKER_CC_REDIS_CONTAINER_NAME,
+  pullDockerCCImage,
+  startRedisContainer,
 } from "./onboard-auth.config-docker-cc.js";
 export {
   OPENROUTER_DEFAULT_MODEL_REF,

@@ -30,7 +30,15 @@ import {
   setVercelAiGatewayApiKey,
   setZaiApiKey,
 } from "../../onboard-auth.js";
-import { applyDockerCCConfig } from "../../onboard-auth.config-docker-cc.js";
+import {
+  applyDockerCCConfig,
+  checkDockerAvailability,
+  checkRedisAvailability,
+  createDockerNetwork,
+  DOCKER_CC_DEFAULT_NETWORK,
+  DOCKER_CC_REDIS_CONTAINER_NAME,
+  startRedisContainer,
+} from "../../onboard-auth.config-docker-cc.js";
 import type { AuthChoice, OnboardOptions } from "../../onboard-types.js";
 import { resolveNonInteractiveApiKey } from "../api-keys.js";
 import { shortenHomePath } from "../../../utils.js";
@@ -68,11 +76,88 @@ export async function applyNonInteractiveAuthChoice(params: {
   }
 
   if (authChoice === "docker-cc") {
-    // Docker CC doesn't require API keys, just enable it
-    runtime.log("Enabling Docker Claude Code provider...");
+    runtime.log("Setting up Docker Claude Code...");
+
+    // Step 1: Check Docker availability
+    const dockerCheck = await checkDockerAvailability();
+    if (!dockerCheck.available) {
+      runtime.error(
+        [
+          "Docker is not available or not running.",
+          dockerCheck.error ? `Error: ${dockerCheck.error}` : "",
+          "",
+          "Please install Docker and ensure it is running, then try again.",
+        ]
+          .filter(Boolean)
+          .join("\n"),
+      );
+      runtime.exit(1);
+      return null;
+    }
+    runtime.log("Docker is available.");
+
+    // Step 2: Create Docker network
+    runtime.log(`Creating Docker network (${DOCKER_CC_DEFAULT_NETWORK})...`);
+    const networkResult = await createDockerNetwork(DOCKER_CC_DEFAULT_NETWORK);
+    if (!networkResult.success && !networkResult.alreadyExists) {
+      runtime.error(`Failed to create Docker network: ${networkResult.error}`);
+      runtime.exit(1);
+      return null;
+    }
+    runtime.log(
+      networkResult.alreadyExists ? "Docker network already exists." : "Docker network created.",
+    );
+
+    // Step 3: Check/Setup Redis
+    const redisUrl = opts.dockerCCRedisUrl ?? "redis://localhost:6379";
+    runtime.log(`Checking Redis availability (${redisUrl})...`);
+    const redisCheck = await checkRedisAvailability(redisUrl);
+
+    if (!redisCheck.available) {
+      runtime.log("Redis not available, starting Redis container...");
+      const redisResult = await startRedisContainer({
+        containerName: DOCKER_CC_REDIS_CONTAINER_NAME,
+        network: DOCKER_CC_DEFAULT_NETWORK,
+        port: 6379,
+      });
+
+      if (!redisResult.success) {
+        runtime.error(
+          [
+            "Failed to start Redis container.",
+            redisResult.error ? `Error: ${redisResult.error}` : "",
+            "",
+            "You can start Redis manually:",
+            `  docker run -d --name ${DOCKER_CC_REDIS_CONTAINER_NAME} \\`,
+            `    --network ${DOCKER_CC_DEFAULT_NETWORK} \\`,
+            "    -p 6379:6379 redis:alpine",
+          ]
+            .filter(Boolean)
+            .join("\n"),
+        );
+        runtime.exit(1);
+        return null;
+      }
+      runtime.log(
+        redisResult.alreadyRunning
+          ? "Redis container already running."
+          : "Redis container started.",
+      );
+
+      // Wait for Redis to be ready
+      await sleep(1500);
+      const verifyRedis = await checkRedisAvailability(redisUrl);
+      if (!verifyRedis.available) {
+        runtime.log("Warning: Redis container started but connection not verified yet.");
+      }
+    } else {
+      runtime.log("Redis is available.");
+    }
+
+    runtime.log("Docker Claude Code setup complete.");
     return applyDockerCCConfig(nextConfig, {
       enabled: true,
-      redisUrl: opts.dockerCCRedisUrl,
+      redisUrl,
     });
   }
 
@@ -377,4 +462,8 @@ export async function applyNonInteractiveAuthChoice(params: {
   }
 
   return nextConfig;
+}
+
+function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
