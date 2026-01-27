@@ -235,6 +235,8 @@ export type AgentDefaultsConfig = {
     /** Auto-prune sandbox containers. */
     prune?: SandboxPruneSettings;
   };
+  /** Docker Claude Code provider configuration. */
+  dockerClaudeCode?: DockerClaudeCodeConfig;
 };
 
 export type AgentCompactionMode = "default" | "safeguard";
@@ -259,4 +261,90 @@ export type AgentCompactionMemoryFlushConfig = {
   prompt?: string;
   /** System prompt appended for the memory flush turn. */
   systemPrompt?: string;
+};
+
+/**
+ * Docker Claude Code pool configuration.
+ */
+export type DockerClaudeCodePoolConfig = {
+  /** Minimum warm containers to maintain. */
+  minWarm?: number;
+  /** Maximum total containers allowed. */
+  maxTotal?: number;
+  /** Maximum containers per agent. */
+  maxPerAgent?: number;
+};
+
+/**
+ * Docker Claude Code resource limits.
+ */
+export type DockerClaudeCodeResourceConfig = {
+  /** Memory limit (e.g., "4g", "2048m"). */
+  memory?: string;
+  /** CPU limit (e.g., 2.0). */
+  cpus?: number;
+  /** Max PIDs in container. */
+  pidsLimit?: number;
+};
+
+/**
+ * Docker Claude Code timeout configuration.
+ */
+export type DockerClaudeCodeTimeoutConfig = {
+  /** Idle timeout before container cleanup (ms). */
+  idleMs?: number;
+  /** Maximum container age (ms). */
+  maxAgeMs?: number;
+  /** Health check interval (ms). */
+  healthIntervalMs?: number;
+  /** Container startup timeout (ms). */
+  startupMs?: number;
+};
+
+/**
+ * Docker Claude Code Redis configuration.
+ */
+export type DockerClaudeCodeRedisConfig = {
+  /** Redis connection URL. */
+  url?: string;
+  /** Key prefix for all Redis keys. */
+  keyPrefix?: string;
+};
+
+/**
+ * Docker Claude Code container configuration.
+ */
+export type DockerClaudeCodeDockerConfig = {
+  /** Container name prefix. */
+  containerPrefix?: string;
+  /** Docker network name. */
+  network?: string;
+  /** Capabilities to drop. */
+  capDrop?: string[];
+  /** Security options. */
+  securityOpts?: string[];
+  /** Additional volume binds. */
+  binds?: string[];
+  /** Additional environment variables. */
+  env?: Record<string, string>;
+};
+
+/**
+ * Docker Claude Code provider configuration.
+ */
+export type DockerClaudeCodeConfig = {
+  /** Enable Docker Claude Code as a provider. */
+  enabled?: boolean;
+  /** Container pool configuration. */
+  pool?: DockerClaudeCodePoolConfig;
+  /** Docker image to use. */
+  image?: string;
+  /** Container resource limits. */
+  resources?: DockerClaudeCodeResourceConfig;
+  /** Timeout configuration. */
+  timeouts?: DockerClaudeCodeTimeoutConfig;
+  /** Redis configuration. */
+  redis?: DockerClaudeCodeRedisConfig;
+  /** Docker-specific configuration. */
+  docker?: DockerClaudeCodeDockerConfig;
 };

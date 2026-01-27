@@ -40,6 +40,21 @@ export function isCliProvider(provider: string, cfg?: MoltbotConfig): boolean {
   return Object.keys(backends).some((key) => normalizeProviderId(key) === normalized);
 }
 
+/**
+ * Check if a provider is the Docker Claude Code provider.
+ */
+export function isDockerClaudeCodeProvider(provider: string): boolean {
+  const normalized = normalizeProviderId(provider);
+  return normalized === "docker-claude-code" || normalized === "docker-cc";
+}
+
+/**
+ * Check if Docker Claude Code is enabled in configuration.
+ */
+export function isDockerClaudeCodeEnabled(cfg?: ClawdbotConfig): boolean {
+  return cfg?.agents?.defaults?.dockerClaudeCode?.enabled === true;
+}
+
 function normalizeAnthropicModelId(model: string): string {
   const trimmed = model.trim();
   if (!trimmed) return trimmed;

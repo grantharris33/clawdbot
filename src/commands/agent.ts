@@ -7,6 +7,7 @@ import {
 } from "../agents/agent-scope.js";
 import { ensureAuthProfileStore } from "../agents/auth-profiles.js";
 import { runCliAgent } from "../agents/cli-runner.js";
+import { runDockerCCAgent } from "../agents/docker-cc-runner.js";
 import { getCliSessionId } from "../agents/cli-session.js";
 import { DEFAULT_MODEL, DEFAULT_PROVIDER } from "../agents/defaults.js";
 import { loadModelCatalog } from "../agents/model-catalog.js";
@@ -14,6 +15,8 @@ import { runWithModelFallback } from "../agents/model-fallback.js";
 import {
   buildAllowedModelSet,
   isCliProvider,
+  isDockerClaudeCodeProvider,
+  isDockerClaudeCodeEnabled,
   modelKey,
   resolveConfiguredModelRef,
   resolveThinkingDefault,
@@ -385,6 +388,25 @@ export async function agentCommand(
         agentDir,
         fallbacksOverride: resolveAgentModelFallbacksOverride(cfg, sessionAgentId),
         run: (providerOverride, modelOverride) => {
+          // Check for Docker Claude Code provider
+          if (isDockerClaudeCodeProvider(providerOverride) && isDockerClaudeCodeEnabled(cfg)) {
+            return runDockerCCAgent({
+              sessionId,
+              sessionKey,
+              sessionFile,
+              workspaceDir,
+              config: cfg,
+              prompt: body,
+              provider: providerOverride,
+              model: modelOverride,
+              thinkLevel: resolvedThinkLevel,
+              timeoutMs,
+              runId,
+              extraSystemPrompt: opts.extraSystemPrompt,
+              images: opts.images,
+              streamParams: opts.streamParams,
+            });
+          }
           if (isCliProvider(providerOverride, cfg)) {
             const cliSessionId = getCliSessionId(sessionEntry, providerOverride);
             return runCliAgent({
