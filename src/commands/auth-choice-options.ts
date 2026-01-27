@@ -20,7 +20,8 @@ export type AuthChoiceGroupId =
   | "minimax"
   | "synthetic"
   | "venice"
-  | "qwen";
+  | "qwen"
+  | "docker-cc";
 
 export type AuthChoiceGroup = {
   value: AuthChoiceGroupId;
@@ -35,6 +36,12 @@ const AUTH_CHOICE_GROUP_DEFS: {
   hint?: string;
   choices: AuthChoice[];
 }[] = [
+  {
+    value: "docker-cc",
+    label: "Docker Claude Code",
+    hint: "Uses subscription (no API costs)",
+    choices: ["docker-cc"],
+  },
   {
     value: "openai",
     label: "OpenAI",
@@ -122,6 +129,11 @@ export function buildAuthChoiceOptions(params: {
   void params.store;
   const options: AuthChoiceOption[] = [];
 
+  options.push({
+    value: "docker-cc",
+    label: "Docker Claude Code",
+    hint: "Run Claude Code in Docker containers (uses subscription, no API costs)",
+  });
   options.push({
     value: "token",
     label: "Anthropic token (paste setup-token)",

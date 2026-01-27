@@ -30,6 +30,7 @@ import {
   setVercelAiGatewayApiKey,
   setZaiApiKey,
 } from "../../onboard-auth.js";
+import { applyDockerCCConfig } from "../../onboard-auth.config-docker-cc.js";
 import type { AuthChoice, OnboardOptions } from "../../onboard-types.js";
 import { resolveNonInteractiveApiKey } from "../api-keys.js";
 import { shortenHomePath } from "../../../utils.js";
@@ -64,6 +65,15 @@ export async function applyNonInteractiveAuthChoice(params: {
     );
     runtime.exit(1);
     return null;
+  }
+
+  if (authChoice === "docker-cc") {
+    // Docker CC doesn't require API keys, just enable it
+    runtime.log("Enabling Docker Claude Code provider...");
+    return applyDockerCCConfig(nextConfig, {
+      enabled: true,
+      redisUrl: opts.dockerCCRedisUrl,
+    });
   }
 
   if (authChoice === "apiKey") {

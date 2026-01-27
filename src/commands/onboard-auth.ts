@@ -33,6 +33,13 @@ export {
   applyOpencodeZenProviderConfig,
 } from "./onboard-auth.config-opencode.js";
 export {
+  applyDockerCCConfig,
+  applyDockerCCProviderConfig,
+  checkDockerAvailability,
+  disableDockerCCConfig,
+  DOCKER_CC_DEFAULT_MODEL_REF,
+} from "./onboard-auth.config-docker-cc.js";
+export {
   OPENROUTER_DEFAULT_MODEL_REF,
   setAnthropicApiKey,
   setGeminiApiKey,

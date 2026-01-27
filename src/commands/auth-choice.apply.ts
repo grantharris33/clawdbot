@@ -4,6 +4,7 @@ import type { WizardPrompter } from "../wizard/prompts.js";
 import { applyAuthChoiceAnthropic } from "./auth-choice.apply.anthropic.js";
 import { applyAuthChoiceApiProviders } from "./auth-choice.apply.api-providers.js";
 import { applyAuthChoiceCopilotProxy } from "./auth-choice.apply.copilot-proxy.js";
+import { applyAuthChoiceDockerCC } from "./auth-choice.apply.docker-cc.js";
 import { applyAuthChoiceGitHubCopilot } from "./auth-choice.apply.github-copilot.js";
 import { applyAuthChoiceGoogleAntigravity } from "./auth-choice.apply.google-antigravity.js";
 import { applyAuthChoiceGoogleGeminiCli } from "./auth-choice.apply.google-gemini-cli.js";
@@ -36,6 +37,7 @@ export async function applyAuthChoice(
   params: ApplyAuthChoiceParams,
 ): Promise<ApplyAuthChoiceResult> {
   const handlers: Array<(p: ApplyAuthChoiceParams) => Promise<ApplyAuthChoiceResult | null>> = [
+    applyAuthChoiceDockerCC,
     applyAuthChoiceAnthropic,
     applyAuthChoiceOpenAI,
     applyAuthChoiceOAuth,

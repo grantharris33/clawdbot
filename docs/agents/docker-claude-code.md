@@ -21,7 +21,31 @@ Docker Claude Code runs Claude Code CLI in isolated Docker containers, providing
 2. **Redis** server accessible (local or remote)
 3. **Claude Code CLI** authentication configured
 
-### Enable Docker Claude Code
+### Setup via Onboarding
+
+The easiest way to configure Docker Claude Code is via the onboarding wizard:
+
+```bash
+# Interactive setup
+clawdbot onboard
+
+# Select "Docker Claude Code" from the provider list
+# Follow the prompts to configure Docker and Redis settings
+```
+
+Or use non-interactive mode:
+
+```bash
+# Non-interactive setup (uses defaults)
+clawdbot onboard --non-interactive --accept-risk --auth-choice docker-cc
+
+# With custom Redis URL
+clawdbot onboard --non-interactive --accept-risk \
+  --auth-choice docker-cc \
+  --docker-cc-redis-url redis://myredis:6379
+```
+
+### Manual Configuration
 
 Add to your `~/.clawdbot/config.yaml`:
 

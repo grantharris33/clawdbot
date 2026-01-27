@@ -31,6 +31,7 @@ export type AuthChoice =
   | "github-copilot"
   | "copilot-proxy"
   | "qwen-portal"
+  | "docker-cc"
   | "skip";
 export type GatewayAuthChoice = "token" | "password";
 export type ResetScope = "config" | "config+creds+sessions" | "full";
@@ -71,6 +72,10 @@ export type OnboardOptions = {
   syntheticApiKey?: string;
   veniceApiKey?: string;
   opencodeZenApiKey?: string;
+  /** Enable Docker Claude Code provider. */
+  dockerCCEnabled?: boolean;
+  /** Redis URL for Docker CC communication (default: redis://localhost:6379). */
+  dockerCCRedisUrl?: string;
   gatewayPort?: number;
   gatewayBind?: GatewayBind;
   gatewayAuth?: GatewayAuthChoice;
