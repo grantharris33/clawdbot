@@ -225,11 +225,7 @@ export async function agentCommand(
         sessionEntry ?? { sessionId, updatedAt: Date.now() };
       const next: SessionEntry = { ...entry, sessionId, updatedAt: Date.now() };
       if (thinkOverride) {
-        if (thinkOverride === "off") {
-          delete next.thinkingLevel;
-        } else {
-          next.thinkingLevel = thinkOverride;
-        }
+        next.thinkingLevel = thinkOverride;
       }
       applyVerboseOverride(next, verboseOverride);
       sessionStore[sessionKey] = next;
@@ -420,6 +416,7 @@ export async function agentCommand(
             return runCliAgent({
               sessionId,
               sessionKey,
+              agentId: sessionAgentId,
               sessionFile,
               workspaceDir,
               config: cfg,
@@ -440,6 +437,7 @@ export async function agentCommand(
           return runEmbeddedPiAgent({
             sessionId,
             sessionKey,
+            agentId: sessionAgentId,
             messageChannel,
             agentAccountId: runContext.accountId,
             messageTo: opts.replyTo ?? opts.to,
@@ -473,6 +471,7 @@ export async function agentCommand(
             lane: opts.lane,
             abortSignal: opts.abortSignal,
             extraSystemPrompt: opts.extraSystemPrompt,
+            inputProvenance: opts.inputProvenance,
             streamParams: opts.streamParams,
             agentDir,
             onAgentEvent: (evt) => {
