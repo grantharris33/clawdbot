@@ -1,7 +1,6 @@
 import type { IncomingMessage, ServerResponse } from "node:http";
 import SlackBolt from "@slack/bolt";
 import type { SessionScope } from "../../config/sessions.js";
-import type { RuntimeEnv } from "../../runtime.js";
 import type { MonitorSlackOpts } from "./types.js";
 import { resolveTextChunkLimit } from "../../auto-reply/chunk.js";
 import { DEFAULT_GROUP_HISTORY_LIMIT } from "../../auto-reply/reply/history.js";
@@ -10,6 +9,7 @@ import { loadConfig } from "../../config/config.js";
 import { warn } from "../../globals.js";
 import { installRequestBodyLimitGuard } from "../../infra/http-body.js";
 import { normalizeMainKey } from "../../routing/session-key.js";
+import { createNonExitingRuntime, type RuntimeEnv } from "../../runtime.js";
 import { resolveSlackAccount } from "../accounts.js";
 import { resolveSlackWebClientOptions } from "../client.js";
 import { normalizeSlackWebhookPath, registerSlackHttpHandler } from "../http/index.js";
@@ -81,20 +81,14 @@ export async function monitorSlackProvider(opts: MonitorSlackOpts = {}) {
     );
   }
 
-  const runtime: RuntimeEnv = opts.runtime ?? {
-    log: console.log,
-    error: console.error,
-    exit: (code: number): never => {
-      throw new Error(`exit ${code}`);
-    },
-  };
+  const runtime: RuntimeEnv = opts.runtime ?? createNonExitingRuntime();
 
   const slackCfg = account.config;
   const dmConfig = slackCfg.dm;
 
   const dmEnabled = dmConfig?.enabled ?? true;
-  const dmPolicy = dmConfig?.policy ?? "pairing";
-  let allowFrom = dmConfig?.allowFrom;
+  const dmPolicy = slackCfg.dmPolicy ?? dmConfig?.policy ?? "pairing";
+  let allowFrom = slackCfg.allowFrom ?? dmConfig?.allowFrom;
   const groupDmEnabled = dmConfig?.groupEnabled ?? false;
   const groupDmChannels = dmConfig?.groupChannels;
   let channelsConfig = slackCfg.channels;
